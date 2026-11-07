@@ -2,7 +2,6 @@ package cars.engine;
 
 import cars.student.Setup;
 import cars.student.StudentCar;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -40,10 +39,7 @@ public final class Window extends JFrame implements Runnable {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                clickPos = new Vector2(
-                    e.getX() - getWidth() / 2.0,
-                    e.getY() - getHeight() / 2.0
-                );
+                clickPos = new Vector2(e.getX() - getWidth() / 2.0, e.getY() - getHeight() / 2.0);
 
                 requestFocusInWindow();
             }
@@ -52,10 +48,7 @@ public final class Window extends JFrame implements Runnable {
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                mousePos = new Vector2(
-                    e.getX() - getWidth() / 2.0,
-                    e.getY() - getHeight() / 2.0
-                );
+                mousePos = new Vector2(e.getX() - getWidth() / 2.0, e.getY() - getHeight() / 2.0);
             }
         });
 
@@ -83,6 +76,10 @@ public final class Window extends JFrame implements Runnable {
 
                     case '5':
                         carro.setComportamento(5);
+                        break;
+
+                    case '6':
+                        carro.setComportamento(6);
                         break;
 
                     case 'd':
@@ -136,44 +133,15 @@ public final class Window extends JFrame implements Runnable {
     }
 
     private void update(final double secs) {
-        cars.forEach(car -> car.update(
-            new World(
-                secs,
-                car,
-                cars,
-                mousePos,
-                clickPos,
-                getWidth(),
-                getHeight()
-            )
-        ));
+        cars.forEach(car -> car.update(new World(secs, car, cars, mousePos, clickPos, getWidth(), getHeight())));
     }
 
     private void draw(Graphics2D g2d) {
-        g2d.setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON
-        );
-
-        g2d.setRenderingHint(
-            RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_BICUBIC
-        );
-
-        g2d.setRenderingHint(
-            RenderingHints.KEY_ALPHA_INTERPOLATION,
-            RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY
-        );
-
-        g2d.setRenderingHint(
-            RenderingHints.KEY_FRACTIONALMETRICS,
-            RenderingHints.VALUE_FRACTIONALMETRICS_ON
-        );
-
-        g2d.setRenderingHint(
-            RenderingHints.KEY_RENDERING,
-            RenderingHints.VALUE_RENDER_QUALITY
-        );
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
         g2d.setBackground(new Color(220, 220, 220));
         g2d.clearRect(0, 0, getWidth(), getHeight());
@@ -182,7 +150,6 @@ public final class Window extends JFrame implements Runnable {
 
         StudentCar carro = (StudentCar) cars.get(0);
 
-        
         // Desenha o caminho do carro
         Vector2[] caminho = carro.getCaminho();
 
@@ -199,12 +166,7 @@ public final class Window extends JFrame implements Runnable {
 
             Vector2 pontoSeguinte = caminho[proximo];
 
-            g2d.drawLine(
-                (int) ponto.x,
-                (int) ponto.y,
-                (int) pontoSeguinte.x,
-                (int) pontoSeguinte.y
-            );
+            g2d.drawLine((int) ponto.x, (int) ponto.y, (int) pontoSeguinte.x, (int) pontoSeguinte.y);
         }
 
         g2d.setColor(Color.RED);
@@ -212,28 +174,20 @@ public final class Window extends JFrame implements Runnable {
         for (int i = 0; i < caminho.length; i++) {
             Vector2 ponto = caminho[i];
 
-            g2d.fillOval(
-                (int) ponto.x - 5,
-                (int) ponto.y - 5,
-                10,
-                10
-            );
-
-            g2d.drawString(
-                "" + (i + 1),
-                (int) ponto.x + 10,
-                (int) ponto.y
-            );
+            g2d.fillOval((int) ponto.x - 5, (int) ponto.y - 5, 10, 10);
+            g2d.drawString("" + (i + 1), (int) ponto.x + 10, (int) ponto.y);
         }
+
+        // Desenha o obstáculo do carro
+        Vector2 obstaculo = carro.getObstaculo();
+        int raio = carro.getRaioObstaculo();
+
+        g2d.setColor(Color.ORANGE);
+        g2d.fillOval((int) obstaculo.x - raio, (int) obstaculo.y - raio, raio * 2, raio * 2);
 
         if (clickPos != null) {
             g2d.setColor(Color.GRAY);
-            g2d.fillOval(
-                (int) clickPos.x - 4,
-                (int) clickPos.y - 4,
-                8,
-                8
-            );
+            g2d.fillOval((int) clickPos.x - 4, (int) clickPos.y - 4, 8, 8);
         }
 
         cars.forEach(car -> car.draw(g2d, debugMode));
@@ -241,10 +195,6 @@ public final class Window extends JFrame implements Runnable {
         g2d.setFont(new Font("Arial", Font.PLAIN, 12));
         g2d.setColor(Color.DARK_GRAY);
 
-        g2d.drawString(
-            "1 Seek | 2 Flee | 3 Arrive | 4 Wander | 5 Caminho | D Vetores",
-            20.0f - getWidth() / 2.0f,
-            getHeight() / 2.0f - 20.0f
-        );
+        g2d.drawString("1 Seek | 2 Flee | 3 Arrive | 4 Wander | 5 Caminho + Desvio | 6 Wander + Desvio | D Vetores", 20.0f - getWidth() / 2.0f, getHeight() / 2.0f - 20.0f);
     }
 }
